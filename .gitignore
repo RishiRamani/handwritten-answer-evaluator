@@ -38,7 +38,7 @@ htmlcov/
 # =========================================================
 
 # Locally downloaded Hugging Face models
-models/
+# models/
 
 # Hugging Face cache
 .huggingface/
