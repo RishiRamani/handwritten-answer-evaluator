@@ -208,6 +208,25 @@ export async function adminDeleteStudent(roll) {
   return handleResponse(res);
 }
 
+
+export async function updateTeacherProfile(data) {
+  const res = await request(`${BASE_URL}/auth/teacher/update`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+  const responseData = await handleResponse(res);
+  // Update stored auth with new data
+  if (responseData.token && responseData.user) {
+    const auth = getAuth();
+    localStorage.setItem("auth", JSON.stringify({
+      token: responseData.token,
+      user: responseData.user
+    }));
+  }
+  return responseData;
+}
+
 // ===== HELPERS =====
 export function normalizeSubmission(s) {
   const statusMap = {

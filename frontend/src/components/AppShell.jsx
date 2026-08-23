@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home, Users, UserPlus, BookOpen, BarChart3, Settings,
-  LogOut, Menu, X, Search, UserRound, Shield
+  LogOut, Menu, X, Search, UserRound, Shield, UploadCloud, ClipboardList
 } from "lucide-react";
 import Logo from "./Logo";
 import { getAuth, logout as clearAuth } from "../services/api";
@@ -12,14 +12,13 @@ export default function AppShell({ role, children }) {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   
-  // Get auth data
   const auth = getAuth();
   const user = auth?.user || {};
 
   const teacherItems = [
     { to: "/teacher/dashboard", label: "Dashboard", icon: <Home /> },
-    { to: "/teacher/upload", label: "Upload Paper", icon: <UserPlus /> },
-    { to: "/teacher/submissions", label: "Submissions", icon: <BarChart3 /> },
+    { to: "/teacher/upload", label: "Upload Paper", icon: <UploadCloud /> },
+    { to: "/teacher/submissions", label: "Submissions", icon: <ClipboardList /> },
     { to: "/teacher/results", label: "Results", icon: <BarChart3 /> },
     { to: "/teacher/exams", label: "Examinations", icon: <BookOpen /> },
     { to: "/teacher/settings", label: "Settings", icon: <Settings /> }
@@ -39,7 +38,6 @@ export default function AppShell({ role, children }) {
     { to: "/admin/create-student", label: "Add Student", icon: <UserPlus /> }
   ];
 
-  // Get items based on role prop (from parent component)
   const getItems = () => {
     if (role === "teacher") return teacherItems;
     if (role === "student") return studentItems;
@@ -49,22 +47,30 @@ export default function AppShell({ role, children }) {
 
   const items = getItems();
 
-  // Get display info based on role
   const getDisplayName = () => {
-    if (role === "teacher") return user?.name || "Teacher";
-    if (role === "student") return user?.roll || "Student";
+    if (role === "teacher") return user?.name || user?.teacherId || "Teacher";
+    if (role === "student") return user?.name || user?.roll || "Student";
     if (role === "admin") return user?.username || "Admin";
     return "User";
   };
 
   const getSubtext = () => {
-    if (role === "teacher") return `Teacher ID: ${user?.teacherId || ""}`;
-    if (role === "student") return "Authenticated student";
+    if (role === "teacher") {
+      const dept = user?.department ? ` · ${user.department}` : "";
+      return `Teacher ID: ${user?.teacherId || ""}${dept}`;
+    }
+    if (role === "student") return `Roll: ${user?.roll || ""}`;
     if (role === "admin") return "Administrator";
     return "";
   };
 
-  
+  const getAvatar = () => {
+    const name = getDisplayName();
+    if (role === "teacher") return name.slice(0, 2).toUpperCase();
+    if (role === "student") return user?.roll?.slice(0, 2).toUpperCase() || "ST";
+    if (role === "admin") return "AD";
+    return "US";
+  };
 
   const getPortalLabel = () => {
     if (role === "teacher") return "TEACHER PORTAL";
@@ -75,9 +81,7 @@ export default function AppShell({ role, children }) {
 
   function logout() {
     clearAuth();
-    // Force navigate to home page
     navigate("/", { replace: true });
-    // Also reload to clear any cached state
     window.location.href = "/";
   }
 
@@ -89,9 +93,7 @@ export default function AppShell({ role, children }) {
           <button className="closeMenu" onClick={() => setMobileOpen(false)}><X /></button>
         </div>
 
-        <div className="portalLabel">
-          {getPortalLabel()}
-        </div>
+        <div className="portalLabel">{getPortalLabel()}</div>
 
         <nav className="sideNav">
           {items.map(item => (
@@ -116,7 +118,7 @@ export default function AppShell({ role, children }) {
           <button className="menuButton" onClick={() => setMobileOpen(true)}><Menu /></button>
           <div className="headerSearch"><Search size={17} /><input placeholder="Search..." /></div>
           <div className="headerUser">
-            
+            <div className="avatar">{getAvatar()}</div>
             <div>
               <strong>{getDisplayName()}</strong>
               <small>{getSubtext()}</small>

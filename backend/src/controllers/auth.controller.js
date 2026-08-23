@@ -16,8 +16,18 @@ export async function login(req, res) {
     return res.json({
       success: true,
       data: {
-        token: createToken({ role, teacherId, teacherName: teacher.name }),
-        user: { role, teacherId, name: teacher.name }
+        token: createToken({ 
+          role, 
+          teacherId, 
+          teacherName: teacher.name,
+          department: teacher.department || ""
+        }),
+        user: { 
+          role, 
+          teacherId, 
+          name: teacher.name,
+          department: teacher.department || ""
+        }
       }
     });
   }
@@ -51,4 +61,45 @@ export async function login(req, res) {
 
 export function me(req, res) {
   res.json({ success: true, data: req.user });
+}
+
+export async function updateTeacher(req, res) {
+  try {
+    const { teacherId, name, department, password } = req.body;
+    const teacher = await Teacher.findOne({ teacherId });
+    
+    if (!teacher) {
+      return res.status(404).json({ success: false, message: "Teacher not found" });
+    }
+    
+    if (name) teacher.name = name;
+    if (department) teacher.department = department;
+    if (password && password.length >= 4) teacher.password = password;
+    
+    await teacher.save();
+    
+    // Update the token with new info
+    const token = createToken({ 
+      role: "teacher", 
+      teacherId, 
+      teacherName: teacher.name,
+      department: teacher.department
+    });
+    
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      data: {
+        token,
+        user: {
+          role: "teacher",
+          teacherId,
+          name: teacher.name,
+          department: teacher.department
+        }
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 }

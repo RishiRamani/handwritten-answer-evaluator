@@ -3,8 +3,12 @@ import { Link } from "react-router-dom";
 import { UploadCloud, FileText, FileCheck2, Clock3, BarChart3, ClipboardList, ChevronRight } from "lucide-react";
 import PageTitle from "../../components/PageTitle";
 import Stat from "../../components/Stat";
+import { getAuth } from "../../services/api";
 
 export default function TeacherDashboard({ papers, loading }) {
+  const auth = getAuth();
+  const teacherName = auth?.user?.name || "Teacher";
+  
   const evaluated = papers.filter(p => p.status === "Evaluated").length;
   const pending = papers.filter(p => p.status === "Pending" || p.status === "Uploaded" || p.status === "OCR Processing" || p.status === "AI Evaluating").length;
   const failed = papers.filter(p => p.status === "Failed").length;
@@ -22,7 +26,7 @@ export default function TeacherDashboard({ papers, loading }) {
     <>
       <PageTitle
         eyebrow="TEACHER · OVERVIEW"
-        title="Good evening, Dr. Sharma 👋"
+        title={`Welcome back, ${teacherName} 👋`}
         desc="Manage answer sheets, evaluations and student results."
         action={<Link className="btn btnPrimary" to="/teacher/upload"><UploadCloud size={17} /> Upload Paper</Link>}
       />
