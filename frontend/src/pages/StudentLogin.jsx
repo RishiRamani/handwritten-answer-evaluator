@@ -7,6 +7,7 @@ import { loginStudent } from "../services/api";
 export default function StudentLogin() {
   const [roll, setRoll] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   async function login() {
@@ -15,11 +16,14 @@ export default function StudentLogin() {
       return;
     }
     try {
+      setLoading(true);
       setError("");
       await loginStudent(roll.trim());
-      navigate("/student/results/" + roll.trim());
+      navigate("/student/dashboard");
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -38,17 +42,20 @@ export default function StudentLogin() {
             onChange={(e) => setRoll(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && login()}
             placeholder="e.g. 2024CSE1021"
+            disabled={loading}
           />
         </label>
 
         {error && <div className="errorBox"><AlertTriangle size={16} />{error}</div>}
 
-        <button className="btn btnPrimary full" onClick={login}>
-          View My Result <ChevronRight size={17} />
+        <button className="btn btnPrimary full" onClick={login} disabled={loading}>
+          {loading ? "Checking..." : "View My Result"} <ChevronRight size={17} />
         </button>
 
-        <small className="demoHint">Demo Roll Number: 2024CSE1021</small>
+        <small className="demoHint">Contact admin if you don't have an account</small>
         <Link className="switchLogin" to="/teacher/login">Go to Teacher Login</Link>
+        <br />
+        <Link className="switchLogin" to="/admin/login">Go to Admin Login</Link>
       </div>
     </div>
   );

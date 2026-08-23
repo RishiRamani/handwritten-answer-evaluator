@@ -2,22 +2,23 @@ import React from "react";
 import { Sparkles } from "lucide-react";
 import Logo from "./Logo";
 
-const quickLinks = [
-  { label: "Home", href: "/" },
-  { label: "Features", href: "#features" },
-  { label: "Workflow", href: "#workflow" },
-  { label: "Teacher Portal", href: "/teacher/login" },
-  { label: "Student Login", href: "/student/login" }
-];
-
-const team = ["Rishi Ramani", "Shubh Tyagi", "Rachit Talwar", "Arnav Jain", "Ikaris"];
+const team = ["Rishi Ramani", "Arnav Jain", "Shubh Tyagi", "Aniket", "Rachit Talwar", "Vanshika"];
 
 export default function Footer() {
+  // Split team into rows of 2
+  const teamRows = [];
+  for (let i = 0; i < team.length; i += 2) {
+    teamRows.push(team.slice(i, i + 2));
+  }
+
   return (
     <footer className="siteFooter" id="about">
       <div className="footerTop">
         <div className="footerBrand">
+          <div style={{display: "flex", justifyContent:"center"}}>
+
           <Logo />
+          </div>
           <p>
             AI-powered evaluation for handwritten answer sheets — OCR
             extraction, automated scoring, and transparent feedback for
@@ -26,24 +27,28 @@ export default function Footer() {
         </div>
 
         <div className="footerCol">
-          <h4>Quick Links</h4>
-          {quickLinks.map(link => (
-            <a key={link.label} href={link.href}>{link.label}</a>
+          <h4>Team</h4>
+          {teamRows.map((row, index) => (
+            <div key={index} style={{ display: "flex", gap: "20px", marginBottom: "4px",
+              justifyContent: "center"
+             }}>
+              {row.map(name => (
+                <span key={name}>{name}</span>
+              ))}
+            </div>
           ))}
         </div>
 
-        <div className="footerCol">
-          <h4>Team</h4>
-          {team.map(name => <span key={name}>{name}</span>)}
-        </div>
+        
       </div>
 
       <div className="footerBottom">
         <div className="stack">
-          <Sparkles size={12} style={{ verticalAlign: "-2px", marginRight: 5 }} />
-          Built with React · Node.js · Express · MongoDB · PaddleOCR · Qwen
+          <Sparkles size={12} style={{ verticalAlign: "-2px", marginRight: 5
+           }} />
+          Built with React · Node.js · Express · MongoDB · PaddleOCR · Qwen · TrOCR · Python
         </div>
-        <div className="copyright">© 2026 EvalX. All rights reserved.</div>
+       
       </div>
     </footer>
   );

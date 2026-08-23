@@ -1,25 +1,33 @@
 import Submission from "../models/Submission.js";
 import Answer from "../models/Answer.js";
 import Evaluation from "../models/Evaluation.js";
+import Student from "../models/Student.js";
 import { getExamById } from "./exam.service.js";
 import { processAnswerSheet } from "./ocr.service.js";
 import { evaluateAnswer } from "./qwen.service.js";
 
-export async function createSubmission({ examId, studentRoll, studentName, file }) {
+export async function createSubmission({ examId, studentRoll, file }) {
   const exam = await getExamById(examId);
+
+  // Try to find existing student, if not found, create with roll as name
+  let student = await Student.findOne({ roll: studentRoll });
+  if (!student) {
+    student = await Student.create({
+      roll: studentRoll,
+      name: `Student ${studentRoll}`
+    });
+  }
 
   const submission = await Submission.create({
     examId: exam._id,
     studentRoll,
-    studentName,
     filePath: file.path,
     fileName: file.originalname,
     fileSize: file.size,
     status: "UPLOADED"
   });
 
-  // Runs in the background so the upload request returns immediately.
-  // The frontend polls GET /submissions/:id to track progress.
+  // Run evaluation pipeline in background
   runEvaluationPipeline(submission._id, exam).catch(err => {
     console.error("[pipeline] failed for submission", submission._id, err.message);
   });
@@ -34,6 +42,7 @@ export async function runEvaluationPipeline(submissionId, examArg) {
   const exam = examArg || (await getExamById(submission.examId));
 
   try {
+    // OCR Step
     submission.status = "OCR_PROCESSING";
     await submission.save();
 
@@ -42,6 +51,7 @@ export async function runEvaluationPipeline(submissionId, examArg) {
     submission.status = "OCR_COMPLETED";
     await submission.save();
 
+    // Create Answers
     const answers = await Answer.insertMany(
       exam.questions.map(q => ({
         submissionId: submission._id,
@@ -50,6 +60,7 @@ export async function runEvaluationPipeline(submissionId, examArg) {
       }))
     );
 
+    // AI Evaluation Step
     submission.status = "AI_EVALUATION";
     await submission.save();
 
@@ -118,5 +129,19 @@ export async function publishSubmission(submissionId) {
 
   submission.published = true;
   await submission.save();
+  return submission;
+}
+
+export async function updateSubmissionScore(submissionId, questionIndex, newScore) {
+  const submission = await getSubmissionById(submissionId);
+  
+  if (!submission.manualEdits) {
+    submission.manualEdits = new Map();
+  }
+  
+  submission.manualEdits.set(questionIndex.toString(), newScore);
+  submission.teacherReviewed = true;
+  await submission.save();
+  
   return submission;
 }

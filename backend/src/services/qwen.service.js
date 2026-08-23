@@ -1,48 +1,43 @@
-import axios from "axios";
-import { env } from "../config/environment.js";
-
 /**
- * Calls Rishi's Qwen evaluation microservice.
- *
- * Contract assumption (adjust to match qwen-service/app/schemas.py):
- *   POST {QWEN_SERVICE_URL}/api/evaluate
- *   body: { question, answer_key, student_answer, max_marks }
- *   -> { correctness, completeness, relevance, score, confidence, feedback }
+ * QWEN SERVICE — placeholder with 5 second delay and random data.
+ * 
+ * Simulates Qwen evaluation with a 5-second delay and returns
+ * mock evaluation results for each question.
  */
 export async function evaluateAnswer({ question, answerKey, studentAnswer, maxMarks }) {
-  let response;
-  try {
-    response = await axios.post(`${env.qwenServiceUrl}/api/evaluate`, {
-      question,
-      answer_key: answerKey,
-      student_answer: studentAnswer,
-      max_marks: maxMarks
-    });
-  } catch (err) {
-    const detail = err.response?.data?.detail || err.message;
-    throw new Error(`Qwen service failed: ${detail}`);
-  }
+  // Simulate 5 second delay
+  await new Promise(resolve => setTimeout(resolve, 5000));
 
-  const data = response.data;
+  // Generate realistic random scores
+  const correctness = 0.5 + Math.random() * 0.5;
+  const completeness = 0.4 + Math.random() * 0.6;
+  const relevance = 0.5 + Math.random() * 0.5;
+  
+  const avg = (correctness + completeness + relevance) / 3;
+  const score = Math.round((maxMarks * avg) / 10) * 10; // Round to nearest 10
+  const confidence = Math.round(avg * 100);
 
-  if (
-    data == null ||
-    typeof data.correctness !== "number" ||
-    typeof data.completeness !== "number" ||
-    typeof data.relevance !== "number" ||
-    typeof data.score !== "number"
-  ) {
-    throw new Error("Qwen service returned an unexpected response shape");
-  }
+  const feedbackOptions = [
+    "Excellent response! The student has demonstrated thorough understanding.",
+    "Good attempt with clear reasoning. Minor improvements could be made.",
+    "The answer covers the main points but lacks some depth.",
+    "Solid understanding shown, with room for more detailed explanation.",
+    "The response is partially correct but misses key elements.",
+    "Good conceptual grasp, but the explanation needs more clarity.",
+    "The student shows good knowledge but could structure the answer better.",
+    "Comprehensive and well-articulated response.",
+    "The answer is on the right track but needs more development.",
+    "Excellent work! The student has mastered this topic."
+  ];
+
+  const feedbackIndex = Math.floor(Math.random() * feedbackOptions.length);
 
   return {
-    correctness: data.correctness,
-    completeness: data.completeness,
-    relevance: data.relevance,
-    score: data.score,
-    confidence: data.confidence ?? Math.round(
-      ((data.correctness + data.completeness + data.relevance) / 3) * 100
-    ),
-    feedback: data.feedback || "No feedback provided."
+    correctness: Math.round(correctness * 10) / 10,
+    completeness: Math.round(completeness * 10) / 10,
+    relevance: Math.round(relevance * 10) / 10,
+    score: Math.min(score, maxMarks),
+    confidence: Math.min(confidence, 100),
+    feedback: feedbackOptions[feedbackIndex]
   };
 }

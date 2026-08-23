@@ -13,13 +13,16 @@ import TeacherSettings from "./TeacherSettings";
 export default function TeacherPortal() {
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   async function refreshPapers() {
     try {
       const data = await listSubmissions();
       setPapers(data.map(normalizeSubmission));
+      setError("");
     } catch (err) {
       console.error("Failed to load submissions:", err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -33,6 +36,11 @@ export default function TeacherPortal() {
 
   return (
     <AppShell role="teacher">
+      {error && (
+        <div className="errorBox" style={{ marginBottom: "16px" }}>
+          <span>⚠️</span> {error}
+        </div>
+      )}
       <Routes>
         <Route path="dashboard" element={<TeacherDashboard papers={papers} loading={loading} />} />
         <Route path="upload" element={<UploadPaper onUploaded={refreshPapers} />} />

@@ -12,6 +12,9 @@ export default function StudentPortal() {
       <Routes>
         <Route path="dashboard" element={<StudentDashboard />} />
         <Route path="results" element={<StudentResults />} />
+        {/* New route with submissionId */}
+        <Route path="results/:roll/:submissionId" element={<StudentResultDetail />} />
+        {/* Fallback route without submissionId (latest result) */}
         <Route path="results/:roll" element={<StudentResultDetail />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="*" element={<Navigate to="dashboard" replace />} />

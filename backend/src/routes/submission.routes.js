@@ -9,5 +9,6 @@ router.post("/", requireAuth, requireRole("teacher"), uploadAnswerSheet, submiss
 router.get("/", requireAuth, requireRole("teacher"), submissionController.listSubmissions);
 router.get("/:id", requireAuth, requireRole("teacher"), submissionController.getSubmission);
 router.patch("/:id/publish", requireAuth, requireRole("teacher"), submissionController.publishSubmission);
+router.patch("/:submissionId/score", requireAuth, requireRole("teacher"), submissionController.updateScore);
 
 export default router;

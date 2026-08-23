@@ -1,5 +1,4 @@
 export function calculateTotals(items) {
-  // items: [{ score, maxMarks, confidence }]
   let totalScore = 0;
   let totalMarks = 0;
   let confidenceSum = 0;

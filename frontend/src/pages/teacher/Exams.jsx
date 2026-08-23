@@ -12,8 +12,10 @@ function ExamCard({ exam }) {
     <div className="panel examCard">
       <div className="examIcon"><BookOpen /></div>
       <span className="badge blue">{exam.subject || "General"}</span>
-      <h2>{exam.title}</h2>
-      <p>{exam.questions?.length || 0} questions · {marks} marks</p>
+      <h2 style={{ fontSize: "15px", margin: "13px 0 4px" }}>{exam.title}</h2>
+      <p style={{ fontSize: "10px", color: "#8991a0", margin: "0 0 17px" }}>
+        {exam.questions?.length || 0} questions · {marks} marks
+      </p>
     </div>
   );
 }
@@ -97,34 +99,82 @@ export default function Exams() {
             <button type="button" className="btn btnSoft" onClick={resetForm}>Cancel</button>
           </div>
 
-          <label>Examination title
-            <input value={title} onChange={event => setTitle(event.target.value)} placeholder="e.g. Data Structures Mid-Term" />
+          <label style={{ display: "block", fontSize: "10px", fontWeight: "800", color: "#566073", marginBottom: "15px" }}>
+            Examination title
+            <input
+              value={title}
+              onChange={event => setTitle(event.target.value)}
+              placeholder="e.g. Data Structures Mid-Term"
+              style={{ display: "block", width: "100%", marginTop: "7px", border: "1px solid #dfe2e9", borderRadius: "9px", padding: "11px 12px", outline: "0", background: "#fff", color: "#252d3c" }}
+            />
           </label>
-          <label>Subject
-            <input value={subject} onChange={event => setSubject(event.target.value)} placeholder="e.g. Data Structures" />
+          <label style={{ display: "block", fontSize: "10px", fontWeight: "800", color: "#566073", marginBottom: "15px" }}>
+            Subject
+            <input
+              value={subject}
+              onChange={event => setSubject(event.target.value)}
+              placeholder="e.g. Data Structures"
+              style={{ display: "block", width: "100%", marginTop: "7px", border: "1px solid #dfe2e9", borderRadius: "9px", padding: "11px 12px", outline: "0", background: "#fff", color: "#252d3c" }}
+            />
           </label>
 
           {questions.map((question, index) => (
             <div className="panel" key={index} style={{ marginTop: 16, padding: 16 }}>
               <div className="panelHeader">
-                <div><h3>Question {index + 1}</h3></div>
-                {questions.length > 1 && <button type="button" className="btn btnSoft" onClick={() => setQuestions(current => current.filter((_, questionIndex) => questionIndex !== index))}><Trash2 size={15} /> Remove</button>}
+                <div><h3 style={{ fontSize: "12px", margin: 0 }}>Question {index + 1}</h3></div>
+                {questions.length > 1 && (
+                  <button
+                    type="button"
+                    className="btn btnSoft"
+                    onClick={() => setQuestions(current => current.filter((_, questionIndex) => questionIndex !== index))}
+                    style={{ padding: "6px 10px", fontSize: "10px" }}
+                  >
+                    <Trash2 size={14} /> Remove
+                  </button>
+                )}
               </div>
-              <label>Question
-                <textarea value={question.questionText} onChange={event => updateQuestion(index, "questionText", event.target.value)} rows="2" placeholder="Enter the question" />
+              <label style={{ display: "block", fontSize: "10px", fontWeight: "800", color: "#566073", marginBottom: "15px" }}>
+                Question
+                <textarea
+                  value={question.questionText}
+                  onChange={event => updateQuestion(index, "questionText", event.target.value)}
+                  rows="2"
+                  placeholder="Enter the question"
+                  style={{ display: "block", width: "100%", marginTop: "7px", border: "1px solid #dfe2e9", borderRadius: "9px", padding: "11px 12px", outline: "0", background: "#fff", color: "#252d3c", resize: "vertical", lineHeight: "1.5" }}
+                />
               </label>
-              <label>Reference answer
-                <textarea value={question.answerKey} onChange={event => updateQuestion(index, "answerKey", event.target.value)} rows="3" placeholder="Enter the answer used by Qwen for grading" />
+              <label style={{ display: "block", fontSize: "10px", fontWeight: "800", color: "#566073", marginBottom: "15px" }}>
+                Reference answer
+                <textarea
+                  value={question.answerKey}
+                  onChange={event => updateQuestion(index, "answerKey", event.target.value)}
+                  rows="3"
+                  placeholder="Enter the answer used by Qwen for grading"
+                  style={{ display: "block", width: "100%", marginTop: "7px", border: "1px solid #dfe2e9", borderRadius: "9px", padding: "11px 12px", outline: "0", background: "#fff", color: "#252d3c", resize: "vertical", lineHeight: "1.5" }}
+                />
               </label>
-              <label>Maximum marks
-                <input type="number" min="0.25" step="0.25" value={question.maxMarks} onChange={event => updateQuestion(index, "maxMarks", event.target.value)} placeholder="10" />
+              <label style={{ display: "block", fontSize: "10px", fontWeight: "800", color: "#566073", marginBottom: "15px" }}>
+                Maximum marks
+                <input
+                  type="number"
+                  min="0.25"
+                  step="0.25"
+                  value={question.maxMarks}
+                  onChange={event => updateQuestion(index, "maxMarks", event.target.value)}
+                  placeholder="10"
+                  style={{ display: "block", width: "100%", marginTop: "7px", border: "1px solid #dfe2e9", borderRadius: "9px", padding: "11px 12px", outline: "0", background: "#fff", color: "#252d3c" }}
+                />
               </label>
             </div>
           ))}
 
-          <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-            <button type="button" className="btn btnSoft" onClick={() => setQuestions(current => [...current, emptyQuestion()])}><Plus size={15} /> Add question</button>
-            <button type="submit" className="btn btnPrimary" disabled={saving}><Check size={16} /> {saving ? "Creating..." : "Create Examination"}</button>
+          <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
+            <button type="button" className="btn btnSoft" onClick={() => setQuestions(current => [...current, emptyQuestion()] )}>
+              <Plus size={15} /> Add question
+            </button>
+            <button type="submit" className="btn btnPrimary" disabled={saving}>
+              <Check size={16} /> {saving ? "Creating..." : "Create Examination"}
+            </button>
           </div>
         </form>
       )}

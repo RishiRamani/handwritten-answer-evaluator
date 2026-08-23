@@ -1,13 +1,24 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, UploadCloud, FileText, Eye, RefreshCw } from "lucide-react";
+import { Search, UploadCloud, FileText, Eye, RefreshCw, AlertTriangle } from "lucide-react";
 import PageTitle from "../../components/PageTitle";
 
 export default function Submissions({ papers, onRefresh }) {
   const [query, setQuery] = useState("");
+  
   const filtered = papers.filter(p =>
     `${p.name} ${p.roll} ${p.exam}`.toLowerCase().includes(query.toLowerCase())
   );
+
+  const getStatusBadge = (status) => {
+    switch(status) {
+      case "Evaluated": return "badge green";
+      case "Failed": return "badge amber";
+      case "OCR Processing":
+      case "AI Evaluating": return "badge blue";
+      default: return "badge amber";
+    }
+  };
 
   return (
     <>
@@ -25,23 +36,43 @@ export default function Submissions({ papers, onRefresh }) {
             <button className="btn btnSoft" onClick={onRefresh}><RefreshCw size={13} /> Refresh</button>
           </div>
         </div>
-        <div className="tableWrap">
-          <table>
-            <thead><tr><th>Student</th><th>Roll No.</th><th>Exam</th><th>PDF</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody>
-              {filtered.map(p => (
-                <tr key={p.id}>
-                  <td><strong>{p.name}</strong></td>
-                  <td>{p.roll}</td>
-                  <td>{p.exam}</td>
-                  <td><span className="filePill"><FileText size={13} />{p.file}</span></td>
-                  <td><span className={p.status === "Pending" ? "badge amber" : p.status === "Failed" ? "badge amber" : "badge green"}>{p.status}</span></td>
-                  <td><Link className="tableButton" to={`/teacher/results/${p.submissionId}`}><Eye size={14} /> {p.status === "Pending" ? "Check status" : "Review"}</Link></td>
+        {papers.length === 0 ? (
+          <p className="muted" style={{ textAlign: "center", padding: "20px 0" }}>
+            No submissions yet. Upload a paper to get started.
+          </p>
+        ) : (
+          <div className="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Roll No.</th>
+                  <th>Exam</th>
+                  <th>PDF</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filtered.map(p => (
+                  <tr key={p.id}>
+                    <td><strong>{p.name}</strong></td>
+                    <td>{p.roll}</td>
+                    <td>{p.exam}</td>
+                    <td><span className="filePill"><FileText size={13} />{p.file}</span></td>
+                    <td><span className={getStatusBadge(p.status)}>{p.status}</span></td>
+                    <td>
+                      <Link className="tableButton" to={`/teacher/results/${p.submissionId}`}>
+                        <Eye size={14} /> 
+                        {p.status === "Evaluated" ? "Review" : "Check status"}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </>
   );

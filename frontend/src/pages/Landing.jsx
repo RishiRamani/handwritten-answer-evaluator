@@ -14,11 +14,11 @@ export default function Landing() {
     <div className="landing">
       <header className="landingNav">
         <Logo />
-        <nav className="landingLinks">
-          <a href="#features">Features</a>
-          <a href="#workflow">Workflow</a>
-          <a href="#about">About</a>
-        </nav>
+<nav className="landingLinks">
+  <a href="#features">Features</a>
+  <a href="#workflow">Workflow</a>
+  <Link to="/admin/login">Admin</Link>
+</nav>
         <div className="navButtons">
           <Link className="btn btnLight" to="/student/login">Student Login</Link>
           <Link className="btn btnPrimary" to="/teacher/login">
@@ -66,7 +66,9 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="workflow" id="workflow">
+      <section className="workflow" id="workflow" style={{
+        marginBottom: "20px"
+      }}>
         <div className="sectionTitle">
           <span>WORKFLOW</span>
           <h2>From answer sheet to result</h2>
