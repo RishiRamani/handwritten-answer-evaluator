@@ -44,6 +44,8 @@ def process_page(
     
     # Extract questions and answers
     qa_pairs = segment_questions(lines)
+    for qa_pair in qa_pairs:
+        qa_pair['page'] = page_number
     
     return {
         'qa_pairs': qa_pairs,
@@ -93,14 +95,43 @@ def process_submission(
     return {
         'submissionId': submission_id,
         'pages': all_pages,
+        'ocrConfidence': _submission_confidence(all_pages),
         'answers': [
             {
                 'questionNumber': qa['question_number'],
                 'questionText': qa['question_text'],
                 'answerText': qa['answer_text'],
+                'ocrConfidence': _answer_confidence(qa, all_pages),
                 'lineRange': qa['line_range'],
                 'page': qa.get('page', 1)
             }
             for qa in all_qa_pairs
         ]
     }
+
+
+def _answer_confidence(qa, pages):
+    page_index = qa.get('page', 1) - 1
+    if page_index < 0 or page_index >= len(pages):
+        return 0
+
+    lines = pages[page_index].get('lines', [])
+    start = qa['line_range']['start']
+    end = qa['line_range']['end']
+    blocks = [block for line in lines[start:end + 1] for block in line]
+    if not blocks:
+        return 0
+
+    return round(sum(block['confidence'] for block in blocks) / len(blocks) * 100)
+
+
+def _submission_confidence(pages):
+    blocks = [
+        block
+        for page in pages
+        for block in page.get('blocks', [])
+    ]
+    if not blocks:
+        return 0
+
+    return round(sum(block['confidence'] for block in blocks) / len(blocks) * 100)

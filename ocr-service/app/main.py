@@ -56,7 +56,8 @@ async def recognize_answer_sheet(file: UploadFile = File(...)):
 		)
 		return {
 			"submissionId": result["submissionId"],
-			"answers": [answer["answerText"] for answer in result["answers"]],
+			"ocrConfidence": result["ocrConfidence"],
+			"answers": result["answers"],
 			"pages": result["pages"],
 		}
 	except Exception as error:

@@ -21,7 +21,24 @@ export default function TeacherEvaluation() {
     }
   }
 
-  useEffect(() => { load(); }, [submissionId]);
+  useEffect(() => {
+    let poller;
+
+    async function loadAndPoll() {
+      await load();
+      poller = window.setInterval(async () => {
+        const raw = await getResult(submissionId);
+        const next = normalizeResult(raw);
+        setData(next);
+        if (next.status === "COMPLETED" || next.status === "FAILED") {
+          window.clearInterval(poller);
+        }
+      }, 5000);
+    }
+
+    loadAndPoll().catch(err => setError(err.message));
+    return () => window.clearInterval(poller);
+  }, [submissionId]);
 
   async function handlePublish() {
     try {
@@ -87,9 +104,6 @@ export default function TeacherEvaluation() {
                 <span className="qNumber">Q{index + 1}</span>
                 <div>
                   <strong>{q.title}</strong>
-                  <small style={{ fontSize: "9px", color: "#6b7280", marginTop: "2px" }}>
-                    Student answer: {q.studentAnswer?.slice(0, 100)}...
-                  </small>
                 </div>
               </div>
               <div className="questionScore" style={{ textAlign: "right" }}>

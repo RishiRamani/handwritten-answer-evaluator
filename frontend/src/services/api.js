@@ -105,6 +105,11 @@ export async function getExam(id) {
   return handleResponse(res);
 }
 
+export async function deleteExam(id) {
+  const res = await request(`${BASE_URL}/exams/${id}`, { method: "DELETE" });
+  return handleResponse(res);
+}
+
 // ===== SUBMISSIONS =====
 export async function uploadSubmission({ examId, studentRoll, file }) {
   const formData = new FormData();
@@ -276,10 +281,20 @@ export function normalizeResult(r) {
       manuallyEdited: q.manuallyEdited || false,
       confidence: q.confidence || 0,
       feedback: q.feedback || "No feedback provided.",
-      studentAnswer: q.studentAnswer || "[No text extracted]",
+      studentAnswer: q.studentAnswer || "",
       correctness: q.correctness,
       completeness: q.completeness,
       relevance: q.relevance
     }))
   };
+}
+
+export async function retrySubmission(id) {
+  const res = await request(`${BASE_URL}/submissions/${id}/retry`, { method: "POST" });
+  return handleResponse(res);
+}
+
+export async function deleteSubmission(id) {
+  const res = await request(`${BASE_URL}/submissions/${id}`, { method: "DELETE" });
+  return handleResponse(res);
 }

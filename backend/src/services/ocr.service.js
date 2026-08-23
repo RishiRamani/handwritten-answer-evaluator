@@ -1,30 +1,50 @@
-/**
- * OCR SERVICE — placeholder with 5 second delay and random data.
- * 
- * Simulates OCR processing with a 5-second delay and returns
- * mock extracted text for each question.
- */
+import axios from "axios";
+import fs from "fs";
+import FormData from "form-data";
+import { env } from "../config/environment.js";
+
 export async function processAnswerSheet(filePath, questions) {
-  // Simulate 5 second delay
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  const form = new FormData();
+  form.append("file", fs.createReadStream(filePath));
 
-  const mockAnswers = {};
-  const mockTexts = [
-    "The answer to this question is clearly stated in the textbook.",
-    "This response demonstrates good understanding of the concept.",
-    "The student has provided a comprehensive explanation with examples.",
-    "The answer is correct and well-articulated.",
-    "This shows partial understanding of the topic.",
-    "The response is detailed and covers all key points.",
-    "The student needs to focus on core concepts.",
-    "Good attempt with minor errors in the explanation."
-  ];
+  let response;
+  try {
+    response = await axios.post(`${env.ocrServiceUrl}/api/ocr`, form, {
+      headers: form.getHeaders(),
+      timeout: env.ocrTimeoutMs,
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity
+    });
+  } catch (error) {
+    const detail = error.response?.data?.detail || error.message;
+    throw new Error(`OCR service failed: ${detail}`);
+  }
 
-  questions.forEach((q, index) => {
-    const textIndex = index % mockTexts.length;
-    mockAnswers[q._id.toString()] = 
-      `[OCR EXTRACTED TEXT] ${mockTexts[textIndex]} (Question: ${q.questionText.slice(0, 30)}...)`;
+  if (!Array.isArray(response.data?.answers)) {
+    throw new Error("OCR service returned an unexpected response shape");
+  }
+
+  const result = {};
+  const fallbackConfidence = Number(response.data.ocrConfidence);
+  const usableFallback = Number.isFinite(fallbackConfidence) ? fallbackConfidence : 0;
+  response.data.answers.forEach((answer, index) => {
+    const question = questions[index];
+    if (question) {
+      const text = typeof answer === "string" ? answer : (answer?.answerText || answer?.text);
+      const confidence = typeof answer === "object" && answer !== null
+        ? Number(answer.ocrConfidence ?? answer.confidence)
+        : null;
+      result[question._id.toString()] = {
+        text: text || "",
+        ocrConfidence: Number.isFinite(confidence) ? confidence : usableFallback
+      };
+    }
   });
 
-  return mockAnswers;
+  questions.forEach(question => {
+    const key = question._id.toString();
+    if (!result[key]) result[key] = { text: "", ocrConfidence: usableFallback };
+  });
+
+  return result;
 }

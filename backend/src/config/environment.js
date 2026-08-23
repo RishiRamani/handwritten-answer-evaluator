@@ -9,5 +9,9 @@ export const env = {
   uploadDir: process.env.UPLOAD_DIR || "uploads",
   authSecret: process.env.AUTH_SECRET || "development-secret-change-me",
   ocrServiceUrl: process.env.OCR_SERVICE_URL || "http://localhost:8001",
-  qwenServiceUrl: process.env.QWEN_SERVICE_URL || "http://localhost:8002"
+  ocrTimeoutMs: Number(process.env.OCR_TIMEOUT_MS) || 120000,
+  qwenServiceUrl: process.env.QWEN_SERVICE_URL || "http://localhost:8002",
+  qwenTimeoutMs: Number(process.env.QWEN_TIMEOUT_MS) || 120000,
+  teacherId: process.env.TEACHER_ID || "TCH001",
+  teacherPassword: process.env.TEACHER_PASSWORD || "demo123"
 };

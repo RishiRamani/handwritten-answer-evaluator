@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, UploadCloud, FileText, Eye, RefreshCw, AlertTriangle } from "lucide-react";
+import { Search, UploadCloud, FileText, Eye, RefreshCw, AlertTriangle, RotateCcw, Trash2 } from "lucide-react";
 import PageTitle from "../../components/PageTitle";
+import { deleteSubmission, retrySubmission } from "../../services/api";
 
 export default function Submissions({ papers, onRefresh }) {
   const [query, setQuery] = useState("");
+  const [busyId, setBusyId] = useState(null);
   
   const filtered = papers.filter(p =>
     `${p.name} ${p.roll} ${p.exam}`.toLowerCase().includes(query.toLowerCase())
@@ -19,6 +21,31 @@ export default function Submissions({ papers, onRefresh }) {
       default: return "badge amber";
     }
   };
+
+  async function retry(id) {
+    try {
+      setBusyId(id);
+      await retrySubmission(id);
+      await onRefresh();
+    } catch (err) {
+      window.alert(err.message);
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function remove(id) {
+    if (!window.confirm("Delete this submission and its evaluation?")) return;
+    try {
+      setBusyId(id);
+      await deleteSubmission(id);
+      await onRefresh();
+    } catch (err) {
+      window.alert(err.message);
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   return (
     <>
@@ -66,6 +93,14 @@ export default function Submissions({ papers, onRefresh }) {
                         <Eye size={14} /> 
                         {p.status === "Evaluated" ? "Review" : "Check status"}
                       </Link>
+                      {p.status === "Failed" && (
+                        <button className="tableButton retryButton" onClick={() => retry(p.submissionId)} disabled={busyId === p.submissionId} style={{ marginLeft: 6 }}>
+                          <RotateCcw size={13} /> Retry
+                        </button>
+                      )}
+                      <button className="tableButton deleteButton" onClick={() => remove(p.submissionId)} disabled={busyId === p.submissionId} style={{ marginLeft: 6 }}>
+                        <Trash2 size={13} /> Delete
+                      </button>
                     </td>
                   </tr>
                 ))}

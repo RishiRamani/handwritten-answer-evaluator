@@ -8,6 +8,7 @@ import Submissions from "./Submissions";
 import TeacherResults from "./TeacherResults";
 import TeacherEvaluation from "./TeacherEvaluation";
 import Exams from "./Exams";
+import ExamDetails from "./ExamDetails";
 import TeacherSettings from "./TeacherSettings";
 
 export default function TeacherPortal() {
@@ -48,6 +49,7 @@ export default function TeacherPortal() {
         <Route path="results" element={<TeacherResults papers={papers} />} />
         <Route path="results/:submissionId" element={<TeacherEvaluation />} />
         <Route path="exams" element={<Exams />} />
+        <Route path="exams/:examId" element={<ExamDetails />} />
         <Route path="settings" element={<TeacherSettings />} />
         <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Routes>

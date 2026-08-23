@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Shield, AlertTriangle, ChevronRight } from "lucide-react";
 import Logo from "../components/Logo";
+import { adminLogin } from "../services/api";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -21,35 +22,7 @@ export default function AdminLogin() {
       setLoading(true);
       setError("");
       
-      // Clear any existing auth first
-      localStorage.removeItem("auth");
-      
-      const res = await fetch("http://localhost:5000/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username.trim(), password })
-      });
-      
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
-      
-      // Verify the role is admin
-      if (data.data?.user?.role !== "admin") {
-        throw new Error("Invalid admin credentials");
-      }
-      
-      // Store auth
-      localStorage.setItem("auth", JSON.stringify(data.data));
-      
-      // Verify it was stored correctly
-      const stored = localStorage.getItem("auth");
-      const parsed = JSON.parse(stored);
-      console.log("[AdminLogin] Stored auth:", parsed);
-      
-      if (parsed?.user?.role !== "admin") {
-        throw new Error("Failed to store admin credentials");
-      }
-      
+      await adminLogin(username.trim(), password);
       navigate("/admin/dashboard", { replace: true });
     } catch (err) {
       setError(err.message);

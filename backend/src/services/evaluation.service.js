@@ -37,7 +37,7 @@ export async function getResultForSubmission(submissionId) {
       correctness: evaluation.correctness,
       completeness: evaluation.completeness,
       relevance: evaluation.relevance,
-      confidence: evaluation.confidence,
+      confidence: answer.ocrConfidence ?? 0,
       feedback: evaluation.feedback || "No feedback provided."
     });
   }

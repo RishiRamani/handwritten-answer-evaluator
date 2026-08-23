@@ -2,6 +2,7 @@ import Submission from "../models/Submission.js";
 import Answer from "../models/Answer.js";
 import Evaluation from "../models/Evaluation.js";
 import Student from "../models/Student.js";
+import fs from "fs/promises";
 import { getExamById } from "./exam.service.js";
 import { processAnswerSheet } from "./ocr.service.js";
 import { evaluateAnswer } from "./qwen.service.js";
@@ -56,7 +57,8 @@ export async function runEvaluationPipeline(submissionId, examArg) {
       exam.questions.map(q => ({
         submissionId: submission._id,
         questionId: q._id,
-        ocrText: ocrResults[q._id.toString()] || ""
+        ocrText: ocrResults[q._id.toString()]?.text || "",
+        ocrConfidence: ocrResults[q._id.toString()]?.ocrConfidence ?? null
       }))
     );
 
@@ -82,7 +84,7 @@ export async function runEvaluationPipeline(submissionId, examArg) {
         completeness: result.completeness,
         relevance: result.relevance,
         score: result.score,
-        confidence: result.confidence,
+        confidence: Number.isFinite(answer.ocrConfidence) ? answer.ocrConfidence : 0,
         feedback: result.feedback
       });
     }
@@ -143,5 +145,54 @@ export async function updateSubmissionScore(submissionId, questionIndex, newScor
   submission.teacherReviewed = true;
   await submission.save();
   
+  return submission;
+}
+
+export async function deleteSubmission(submissionId) {
+  const submission = await Submission.findById(submissionId);
+  if (!submission) {
+    const err = new Error("Submission not found");
+    err.status = 404;
+    throw err;
+  }
+
+  const answers = await Answer.find({ submissionId }).select("_id");
+  await Evaluation.deleteMany({ answerId: { $in: answers.map(answer => answer._id) } });
+  await Answer.deleteMany({ submissionId });
+  await Submission.deleteOne({ _id: submissionId });
+  await fs.unlink(submission.filePath).catch(() => {});
+
+  return { deleted: true };
+}
+
+export async function retrySubmission(submissionId) {
+  const submission = await Submission.findById(submissionId);
+  if (!submission) {
+    const err = new Error("Submission not found");
+    err.status = 404;
+    throw err;
+  }
+  if (!["FAILED", "COMPLETED"].includes(submission.status)) {
+    const err = new Error("Only failed or completed submissions can be retried");
+    err.status = 400;
+    throw err;
+  }
+
+  const exam = await getExamById(submission.examId);
+  const answers = await Answer.find({ submissionId }).select("_id");
+  await Evaluation.deleteMany({ answerId: { $in: answers.map(answer => answer._id) } });
+  await Answer.deleteMany({ submissionId });
+
+  submission.status = "UPLOADED";
+  submission.failureReason = "";
+  submission.published = false;
+  submission.manualEdits = new Map();
+  submission.teacherReviewed = false;
+  await submission.save();
+
+  runEvaluationPipeline(submission._id, exam).catch(err => {
+    console.error("[pipeline] retry failed for submission", submission._id, err.message);
+  });
+
   return submission;
 }

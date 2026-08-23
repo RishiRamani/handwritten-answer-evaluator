@@ -12,6 +12,7 @@
 .footerBottom .stack{font-size:11px;color:#a29dc4}
 .footerBottom .copyright{font-size:10px;color:#736c99}
 @media(max-width:760px){.footerTop{grid-template-columns:1fr;gap:28px}}
+.retryButton,.deleteButton{border:0}.retryButton{background:#fff3d6;color:#a96c00}.retryButton:hover{background:#ffe8b0;color:#8f5900}.deleteButton{background:#fff0ef;color:#b74338}.deleteButton:hover{background:#ffdcd8;color:#9f352c}.retryButton:disabled,.deleteButton:disabled{opacity:.6;cursor:not-allowed}
 .panel label input,
 .panel label textarea {
   font-size: 10px;

@@ -26,6 +26,7 @@ def paddleocr_to_blocks(
         polygons = page.get("dt_polys", [])
 
         for index, (text, score, box) in enumerate(zip(texts, scores, boxes)):
+            marker_text = text
             if line_recognizer is not None and image is not None:
                 polygon = polygons[index] if index < len(polygons) else box
                 recognized_text = _recognize_crop(
@@ -45,8 +46,9 @@ def paddleocr_to_blocks(
 
             blocks.append({
                 "text": text,
+                "marker_text": marker_text.strip(),
                 "confidence": float(score),
-                "bbox": box.tolist(),
+                "bbox": np.asarray(box).tolist(),
                 "page": page_number
             })
 

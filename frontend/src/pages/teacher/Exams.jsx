@@ -1,21 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { AlertTriangle, BookOpen, Check, Plus, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import PageTitle from "../../components/PageTitle";
-import { createExam, listExams } from "../../services/api";
+import { createExam, deleteExam, listExams } from "../../services/api";
 
 const emptyQuestion = () => ({ questionText: "", answerKey: "", maxMarks: "" });
 
 function ExamCard({ exam }) {
+  const [deleting, setDeleting] = useState(false);
+  const navigate = useNavigate();
   const marks = exam.questions?.reduce((total, question) => total + Number(question.maxMarks || 0), 0) || 0;
 
+  async function remove() {
+    if (!window.confirm(`Delete ${exam.title}? This also deletes its submissions and results.`)) return;
+    try {
+      setDeleting(true);
+      await deleteExam(exam._id);
+      window.location.reload();
+    } catch (error) {
+      window.alert(error.message);
+      setDeleting(false);
+    }
+  }
+
   return (
-    <div className="panel examCard">
+    <div className="panel examCard" role="button" tabIndex="0" onClick={() => navigate(`/teacher/exams/${exam._id}`)} onKeyDown={event => event.key === "Enter" && navigate(`/teacher/exams/${exam._id}`)}>
       <div className="examIcon"><BookOpen /></div>
       <span className="badge blue">{exam.subject || "General"}</span>
       <h2 style={{ fontSize: "15px", margin: "13px 0 4px" }}>{exam.title}</h2>
       <p style={{ fontSize: "10px", color: "#8991a0", margin: "0 0 17px" }}>
         {exam.questions?.length || 0} questions · {marks} marks
       </p>
+      <button className="btn btnSoft full" onClick={event => { event.stopPropagation(); remove(); }} disabled={deleting}>
+        <Trash2 size={14} /> {deleting ? "Deleting..." : "Delete Examination"}
+      </button>
     </div>
   );
 }

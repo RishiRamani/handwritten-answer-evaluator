@@ -59,7 +59,8 @@ def segment_questions(lines):
     
     for line_idx, line in enumerate(lines):
         line_text = ' '.join(block['text'] for block in line)
-        question_num, marker_type = detect_question_marker(line_text)
+        marker_line_text = ' '.join(block.get('marker_text', block['text']) for block in line)
+        question_num, marker_type = detect_question_marker(marker_line_text)
         
         if question_num:
             # Save previous question
@@ -85,7 +86,7 @@ def segment_questions(lines):
             # This line belongs to the current question
             if current_question is not None:
                 # Check if this line contains an answer marker
-                has_answer_marker, answer_text = detect_answer_marker(line_text)
+                has_answer_marker, answer_text = detect_answer_marker(marker_line_text)
                 
                 if has_answer_marker and not found_answer:
                     # Found the start of the answer

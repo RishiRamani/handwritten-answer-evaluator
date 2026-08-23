@@ -74,3 +74,12 @@ export async function addQuestion(req, res, next) {
     next(err);
   }
 }
+
+export async function deleteExam(req, res, next) {
+  try {
+    const result = await examService.deleteExam(req.params.id);
+    res.json(successResponse(result, "Exam deleted"));
+  } catch (err) {
+    next(err);
+  }
+}

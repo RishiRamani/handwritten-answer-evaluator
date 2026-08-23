@@ -199,8 +199,7 @@ def validate_result(
     required_fields = {
         "correctness",
         "completeness",
-        "relevance",
-        "feedback"
+        "relevance"
     }
 
     missing_fields = required_fields - data.keys()
@@ -248,13 +247,27 @@ def validate_result(
     # Build the final validated result.
     # -----------------------------------------------------
 
+    feedback = str(data.get("feedback") or _fallback_feedback(
+        correctness,
+        completeness,
+        relevance,
+    ))
+
     return EvaluationResult(
         correctness=correctness,
         completeness=completeness,
         relevance=relevance,
         score=score,
-        feedback=str(data["feedback"])
+        feedback=feedback
     )
+
+
+def _fallback_feedback(correctness: float, completeness: float, relevance: float) -> str:
+    weakest_dimension = min(
+        [(correctness, "correctness"), (completeness, "completeness"), (relevance, "relevance")],
+        key=lambda item: item[0],
+    )[1]
+    return f"The answer was evaluated. Review the response for improved {weakest_dimension}."
 
 
 def evaluate_answer(

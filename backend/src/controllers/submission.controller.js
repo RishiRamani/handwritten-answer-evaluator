@@ -83,3 +83,21 @@ export async function updateScore(req, res, next) {
     next(err);
   }
 }
+
+export async function deleteSubmission(req, res, next) {
+  try {
+    const result = await submissionService.deleteSubmission(req.params.id);
+    res.json(successResponse(result, "Submission deleted"));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function retrySubmission(req, res, next) {
+  try {
+    const submission = await submissionService.retrySubmission(req.params.id);
+    res.json(successResponse(submission, "Submission retry started"));
+  } catch (err) {
+    next(err);
+  }
+}

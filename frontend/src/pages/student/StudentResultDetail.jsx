@@ -141,14 +141,16 @@ export default function StudentResultDetail() {
                   <p style={{ fontSize: "9px", color: "#6b7280", margin: "4px 0 0" }}>
                     {q.feedback || "No feedback available."}
                   </p>
-                  <details style={{ marginTop: "4px" }}>
-                    <summary style={{ fontSize: "8px", color: "#6b7280", cursor: "pointer" }}>
-                      View student answer
-                    </summary>
-                    <p style={{ fontSize: "8px", color: "#374151", background: "#f3f4f6", padding: "6px", borderRadius: "4px", margin: "4px 0 0" }}>
-                      {q.studentAnswer || "[No answer extracted]"}
-                    </p>
-                  </details>
+                  {q.studentAnswer && (
+                    <details style={{ marginTop: "4px" }}>
+                      <summary style={{ fontSize: "8px", color: "#6b7280", cursor: "pointer" }}>
+                        View student answer
+                      </summary>
+                      <p style={{ fontSize: "8px", color: "#374151", background: "#f3f4f6", padding: "6px", borderRadius: "4px", margin: "4px 0 0" }}>
+                        {q.studentAnswer}
+                      </p>
+                    </details>
+                  )}
                 </div>
                 <strong style={{ fontSize: "17px", minWidth: "60px", textAlign: "right" }}>
                   {q.marks || 0}/{q.total || 0}
