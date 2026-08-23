@@ -49,7 +49,12 @@ export async function getResultForSubmission(submissionId) {
   };
 }
 
-export async function getPublishedResultForStudent(studentRoll) {
+export async function getPublishedResultForStudent(studentRoll, authenticatedRoll) {
+  if (studentRoll !== authenticatedRoll) {
+    const err = new Error("You can only view your own result");
+    err.status = 403;
+    throw err;
+  }
   const submission = await Submission.findOne({
     studentRoll,
     published: true

@@ -5,6 +5,7 @@ import { connectDatabase } from "./config/database.js";
 import examRoutes from "./routes/exam.routes.js";
 import submissionRoutes from "./routes/submission.routes.js";
 import evaluationRoutes from "./routes/evaluation.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import { notFoundHandler, errorHandler } from "./middleware/error.middleware.js";
 
 const app = express();
@@ -17,6 +18,7 @@ app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 app.use("/api/exams", examRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api/results", evaluationRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

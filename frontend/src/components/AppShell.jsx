@@ -5,6 +5,7 @@ import {
   LogOut, Menu, X, Search, UserRound
 } from "lucide-react";
 import Logo from "./Logo";
+import { getAuth, logout as clearAuth } from "../services/api";
 
 export default function AppShell({ role, children }) {
   const location = useLocation();
@@ -26,10 +27,12 @@ export default function AppShell({ role, children }) {
   ];
 
   const items = role === "teacher" ? teacherItems : studentItems;
-  const teacherId = sessionStorage.getItem("teacherId") || "TCH001";
+  const auth = getAuth();
+  const teacherId = auth?.user?.teacherId || "";
+  const studentRoll = auth?.user?.roll || "";
 
   function logout() {
-    if (role === "teacher") sessionStorage.removeItem("teacherId");
+    clearAuth();
     window.location.href = "/";
   }
 
@@ -70,8 +73,8 @@ export default function AppShell({ role, children }) {
           <div className="headerUser">
             <div className="avatar">{role === "teacher" ? "DS" : "RS"}</div>
             <div>
-              <strong>{role === "teacher" ? "Dr. Sharma" : "Rahul Sharma"}</strong>
-              <small>{role === "teacher" ? `Teacher ID: ${teacherId}` : "Roll: 2024CSE1234"}</small>
+              <strong>{role === "teacher" ? "Dr. Sharma" : studentRoll}</strong>
+              <small>{role === "teacher" ? `Teacher ID: ${teacherId}` : "Authenticated student"}</small>
             </div>
           </div>
         </header>

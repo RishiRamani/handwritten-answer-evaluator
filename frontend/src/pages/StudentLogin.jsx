@@ -2,19 +2,25 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GraduationCap, AlertTriangle, ChevronRight } from "lucide-react";
 import Logo from "../components/Logo";
+import { loginStudent } from "../services/api";
 
 export default function StudentLogin() {
   const [roll, setRoll] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  function login() {
+  async function login() {
     if (!roll.trim()) {
       setError("Please enter your Roll Number.");
       return;
     }
-    setError("");
-    navigate("/student/results/" + roll.trim());
+    try {
+      setError("");
+      await loginStudent(roll.trim());
+      navigate("/student/results/" + roll.trim());
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   return (

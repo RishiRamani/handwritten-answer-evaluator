@@ -5,6 +5,7 @@ import TeacherLogin from "./pages/TeacherLogin";
 import StudentLogin from "./pages/StudentLogin";
 import TeacherPortal from "./pages/teacher/TeacherPortal";
 import StudentPortal from "./pages/student/StudentPortal";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -12,8 +13,8 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/teacher/login" element={<TeacherLogin />} />
       <Route path="/student/login" element={<StudentLogin />} />
-      <Route path="/teacher/*" element={<TeacherPortal />} />
-      <Route path="/student/*" element={<StudentPortal />} />
+      <Route path="/teacher/*" element={<ProtectedRoute role="teacher"><TeacherPortal /></ProtectedRoute>} />
+      <Route path="/student/*" element={<ProtectedRoute role="student"><StudentPortal /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

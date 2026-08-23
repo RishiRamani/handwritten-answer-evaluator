@@ -12,7 +12,7 @@ export async function getResult(req, res, next) {
 
 export async function getStudentResult(req, res, next) {
   try {
-    const result = await evaluationService.getPublishedResultForStudent(req.params.roll);
+    const result = await evaluationService.getPublishedResultForStudent(req.params.roll, req.user.roll);
     res.json(successResponse(result));
   } catch (err) {
     next(err);

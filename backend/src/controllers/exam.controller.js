@@ -3,7 +3,7 @@ import { successResponse } from "../utils/response.js";
 
 export async function createExam(req, res, next) {
   try {
-    const { title, subject, teacherId, questions } = req.body;
+    const { title, subject, questions } = req.body;
 
     const hasInvalidQuestion = !Array.isArray(questions) || questions.some(question => (
       !question ||
@@ -22,7 +22,12 @@ export async function createExam(req, res, next) {
       });
     }
 
-    const exam = await examService.createExam({ title, subject, teacherId, questions });
+    const exam = await examService.createExam({
+      title,
+      subject,
+      teacherId: req.user.teacherId,
+      questions
+    });
     res.status(201).json(successResponse(exam, "Exam created"));
   } catch (err) {
     next(err);
