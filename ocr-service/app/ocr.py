@@ -32,4 +32,4 @@ def run_ocr(image_path: str):
     Run PaddleOCR on a single preprocessed image.
     """
 
-    return ocr.predict(image_path)
+    return ocr.predict(str(image_path))

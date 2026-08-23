@@ -4,7 +4,13 @@ from postprocessing.reading_order import reconstruct_reading_order
 from postprocessing.question_detection import segment_questions
 
 
-def process_page(ocr_result, page_number=1, clean_noise=True):
+def process_page(
+    ocr_result,
+    page_number=1,
+    clean_noise=True,
+    image=None,
+    line_recognizer=None,
+):
     """
     Process a single page's OCR result through the full post-processing pipeline.
     
@@ -22,7 +28,12 @@ def process_page(ocr_result, page_number=1, clean_noise=True):
         }
     """
     # Convert to blocks
-    blocks = paddleocr_to_blocks(ocr_result, page_number)
+    blocks = paddleocr_to_blocks(
+        ocr_result,
+        page_number,
+        image=image,
+        line_recognizer=line_recognizer,
+    )
     
     # Clean noise (optional)
     if clean_noise:
@@ -42,7 +53,13 @@ def process_page(ocr_result, page_number=1, clean_noise=True):
     }
 
 
-def process_submission(ocr_results, submission_id="SUB123", clean_noise=True):
+def process_submission(
+    ocr_results,
+    submission_id="SUB123",
+    clean_noise=True,
+    page_images=None,
+    line_recognizer=None,
+):
     """
     Process multiple pages of a submission.
     
@@ -57,8 +74,17 @@ def process_submission(ocr_results, submission_id="SUB123", clean_noise=True):
     all_pages = []
     all_qa_pairs = []
     
+    page_images = page_images or []
+
     for page_num, ocr_result in enumerate(ocr_results, start=1):
-        page_result = process_page(ocr_result, page_num, clean_noise)
+        image = page_images[page_num - 1] if page_num <= len(page_images) else None
+        page_result = process_page(
+            ocr_result,
+            page_num,
+            clean_noise,
+            image=image,
+            line_recognizer=line_recognizer,
+        )
         all_pages.append(page_result)
         all_qa_pairs.extend(page_result['qa_pairs'])
     

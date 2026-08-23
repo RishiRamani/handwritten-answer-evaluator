@@ -22,7 +22,14 @@ def health_check():
     }
 
 
-@app.post("/evaluate", response_model=EvaluationResult)
+@app.post(
+    "/evaluate",
+    response_model=EvaluationResult,
+)
+@app.post(
+    "/api/evaluate",
+    response_model=EvaluationResult,
+)
 def evaluate(request: EvaluationRequest):
     """
     Evaluate one student's answer.

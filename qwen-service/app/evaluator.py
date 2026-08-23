@@ -37,6 +37,8 @@ Important:
 - If the answer contains a major factual error about the central
   concept, correctness should be 0.0–0.2, even if some other
   statements are correct.
+- If the answer has spelling mistakes or errors that can be otherwise justified with correct spelling,
+    correctness should be high since OCR is not perfect.
 - If the answer is factually correct but missing important
   information, keep correctness high and reduce completeness.
 - Correct but incomplete answers receive partial credit, not zero.

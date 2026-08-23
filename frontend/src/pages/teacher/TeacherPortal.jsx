@@ -25,7 +25,11 @@ export default function TeacherPortal() {
     }
   }
 
-  useEffect(() => { refreshPapers(); }, []);
+  useEffect(() => {
+    refreshPapers();
+    const poller = window.setInterval(refreshPapers, 5000);
+    return () => window.clearInterval(poller);
+  }, []);
 
   return (
     <AppShell role="teacher">

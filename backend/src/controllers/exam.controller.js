@@ -5,10 +5,20 @@ export async function createExam(req, res, next) {
   try {
     const { title, subject, teacherId, questions } = req.body;
 
-    if (!title || !Array.isArray(questions) || questions.length === 0) {
+    const hasInvalidQuestion = !Array.isArray(questions) || questions.some(question => (
+      !question ||
+      typeof question.questionText !== "string" ||
+      !question.questionText.trim() ||
+      typeof question.answerKey !== "string" ||
+      !question.answerKey.trim() ||
+      !Number.isFinite(Number(question.maxMarks)) ||
+      Number(question.maxMarks) <= 0
+    ));
+
+    if (!title?.trim() || !Array.isArray(questions) || questions.length === 0 || hasInvalidQuestion) {
       return res.status(400).json({
         success: false,
-        message: "title and at least one question are required"
+        message: "title and at least one valid question are required"
       });
     }
 

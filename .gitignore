@@ -61,6 +61,7 @@ qwen-service/logs/
 qwen-service/tmp/
 qwen-service/output/
 qwen-service/uploads/
+qwen-service/models/
 
 
 # =========================================================
