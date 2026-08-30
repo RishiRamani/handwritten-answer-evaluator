@@ -7,6 +7,9 @@ def detect_question_marker(text):
     """
     patterns = [
         (r'^Q\s*(\d+)', 'Q'),
+        (r'^9([1-9])(?:\s|$)', 'ocr-q'),
+        (r'^0*(\d+)\s+', 'prefixed-number'),
+        (r'^0*(\d+)$', 'bare-number'),
         (r'^Q\.\s*(\d+)', 'Q.'),
         (r'^Q\)\s*(\d+)', 'Q)'),
         (r'^Q\:\s*(\d+)', 'Q:'),
@@ -36,6 +39,7 @@ def detect_answer_marker(text):
         (r'^Ans\.?\s*[:.]?\s*(.*)', 'Ans.'),
         (r'^Answer\s*[:.]?\s*(.*)', 'Answer'),
         (r'^Ans\s*[:.]?\s*(.*)', 'Ans'),
+        (r'^An\.?\s*[:.]?\s*(.*)', 'An.'),
     ]
     
     for pattern, _ in patterns:
@@ -77,10 +81,10 @@ def segment_questions(lines):
             
             # Start new question
             current_question = question_num
-            current_question_lines = [line_text]
+            current_question_lines = [] if marker_type == 'bare-number' else [line_text]
             current_answer_lines = []
             current_line_start = line_idx
-            found_answer = False
+            found_answer = marker_type == 'bare-number'
             
         else:
             # This line belongs to the current question

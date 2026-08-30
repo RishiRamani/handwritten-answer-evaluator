@@ -29,7 +29,6 @@ def process_pdf(pdf_path, submission_id="SUB123"):
 			ocr_results,
 			submission_id=submission_id,
 			page_images=page_images,
-			line_recognizer=recognize_line,
 		)
 
 

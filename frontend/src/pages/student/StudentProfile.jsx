@@ -1,110 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { AlertTriangle } from "lucide-react";
 import PageTitle from "../../components/PageTitle";
-import { getAuth, getAllStudentResults, normalizeResult } from "../../services/api";
+import { getAuth } from "../../services/api";
 
 export default function StudentProfile() {
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const auth = getAuth();
-  const roll = auth?.user?.roll;
-  const studentName = auth?.user?.name || `Student ${roll}`;
+  const user = auth?.user || {};
+  const roll = user.roll || "Not available";
+  const studentName = user.name || `Student ${roll}`;
+  const program = user.program || "Not provided";
+  const year = user.year || "Not provided";
 
-  useEffect(() => {
-    if (roll) {
-      getAllStudentResults(roll)
-        .then(rawData => {
-          const normalized = (rawData || []).map(normalizeResult);
-          setResults(normalized);
-          setLoading(false);
-        })
-        .catch(err => {
-          setError(err.message);
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-      setError("No roll number found. Please login again.");
-    }
-  }, [roll]);
+  if (!auth || !user.role) {
+    return <div className="errorBox"><AlertTriangle size={16} />No student profile found. Please login again.</div>;
+  }
 
-  if (loading) return <p>Loading profile...</p>;
-  if (error) return <div className="errorBox"><AlertTriangle size={16} />{error}</div>;
-
-  const publishedResults = results.filter(r => r.published);
-  const totalScore = publishedResults.reduce((sum, r) => sum + (r.score || 0), 0);
-  const totalMarks = publishedResults.reduce((sum, r) => sum + (r.totalMarks || 0), 0);
-  const avgScore = publishedResults.length > 0 && totalMarks > 0 
-    ? Math.round((totalScore / totalMarks) * 100) 
-    : 0;
-  const latest = results.length > 0 ? results[0] : null;
+  const infoCards = [
+    { label: "Full Name", value: studentName },
+    { label: "Roll Number", value: roll },
+    { label: "Program", value: program },
+    { label: "Year", value: year },
+    { label: "Role", value: user.role || "student" }
+  ];
 
   return (
     <>
-      <PageTitle eyebrow="STUDENT · PROFILE" title="My Profile" desc="Your student information and performance overview." />
-      
+      <PageTitle eyebrow="STUDENT · PROFILE" title="My Profile" desc="Your student information" />
+
       <div className="panel profileCard">
         <div className="largeAvatar">
           {studentName.slice(0, 2).toUpperCase()}
         </div>
         <h2>{studentName}</h2>
-        <p>Roll No. {roll}</p>
-        
-        <div className="profileGrid">
-          <div>
-            <small>Total Results</small>
-            <strong>{results.length}</strong>
-          </div>
-          <div>
-            <small>Published Results</small>
-            <strong>{publishedResults.length}</strong>
-          </div>
-          <div>
-            <small>Overall Average</small>
-            <strong>{avgScore}%</strong>
-          </div>
-          <div>
-            <small>Latest Exam</small>
-            <strong>{latest?.exam || "N/A"}</strong>
-          </div>
-        </div>
-      </div>
+        <p>{program !== "Not provided" ? program : "Student profile"}</p>
 
-      <div className="panel">
-        <div className="panelHeader">
-          <div><h2>All Results</h2><p>Complete examination history</p></div>
-        </div>
-        {results.length === 0 ? (
-          <p className="muted">No results available yet.</p>
-        ) : (
-          results.map((r, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "12px 0",
-                borderBottom: i < results.length - 1 ? "1px solid #e5e7eb" : "none"
-              }}
-            >
-              <div>
-                <strong style={{ fontSize: "13px" }}>{r.exam}</strong>
-                <br />
-                <span style={{ fontSize: "9px", color: r.published ? "#2b9b75" : "#d97706" }}>
-                  {r.published ? "✅ Published" : "⏳ Pending"}
-                </span>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <strong style={{ fontSize: "18px" }}>{r.score || 0}</strong>
-                <small style={{ fontSize: "11px", color: "#6b7280" }}>/{r.totalMarks || 0}</small>
-                <br />
-                <span style={{ fontSize: "9px", color: "#6b7280" }}>{r.confidence || 0}% confidence</span>
-              </div>
+        <div className="profileGrid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+          {infoCards.map(item => (
+            <div key={item.label}>
+              <small>{item.label}</small>
+              <strong>{item.value}</strong>
             </div>
-          ))
-        )}
+          ))}
+        </div>
       </div>
     </>
   );

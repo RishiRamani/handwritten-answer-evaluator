@@ -26,7 +26,7 @@ export default function TeacherDashboard({ papers, loading }) {
     <>
       <PageTitle
         eyebrow="TEACHER · OVERVIEW"
-        title={`Welcome back, ${teacherName} 👋`}
+        title={`Welcome back, ${teacherName}!`}
         desc="Manage answer sheets, evaluations and student results."
         action={<Link className="btn btnPrimary" to="/teacher/upload"><UploadCloud size={17} /> Upload Paper</Link>}
       />

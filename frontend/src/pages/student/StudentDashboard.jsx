@@ -48,7 +48,7 @@ export default function StudentDashboard() {
     <>
       <PageTitle
         eyebrow="STUDENT · DASHBOARD"
-        title={`Hello, ${studentName} 👋`}
+        title={`Hello, ${studentName}!`}
         desc={`Roll No. ${roll}`}
       />
 
@@ -83,11 +83,51 @@ export default function StudentDashboard() {
           <div className="panelHeader">
             <div><h2>Summary</h2><p>Your academic snapshot</p></div>
           </div>
-          <div className="quickAction"><Target size={17} /><div><strong>Average percentage</strong><small>Across published exams</small></div><b>{averagePercentage}%</b></div>
-          <div className="quickAction"><Trophy size={17} /><div><strong>Best performance</strong><small>Highest exam percentage</small></div><b>{bestPercentage}%</b></div>
-          <div className="quickAction"><BookOpen size={17} /><div><strong>Exams completed</strong><small>Published results</small></div><b>{publishedResults.length}</b></div>
-          <div className="quickAction"><Clock3 size={17} /><div><strong>Pending results</strong><small>Waiting for publication</small></div><b>{pendingResults.length}</b></div>
-          <div className="quickAction"><BarChart3 size={17} /><div><strong>Questions evaluated</strong><small>Total published questions</small></div><b>{completedQuestions}</b></div>
+
+          <div className="quickAction" style={{ display: "grid", gridTemplateColumns: "18px minmax(0, 1fr) auto", alignItems: "center", gap: "12px 14px", padding: "13px 4px", borderTop: "1px solid #eff0f4" }}>
+            <Target size={17} style={{ color: "#6758e8" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "3px", minWidth: 0 }}>
+              <strong style={{ fontSize: 12, lineHeight: 1.3 }}>Average percentage</strong>
+              <small style={{ fontSize: 10, color: "#697385" }}>Across published exams</small>
+            </div>
+            <b style={{ justifySelf: "end", minWidth: "62px", textAlign: "right", fontSize: 15, lineHeight: 1.2 }}>{averagePercentage}%</b>
+          </div>
+
+          <div className="quickAction" style={{ display: "grid", gridTemplateColumns: "18px minmax(0, 1fr) auto", alignItems: "center", gap: "12px 14px", padding: "13px 4px", borderTop: "1px solid #eff0f4" }}>
+            <Trophy size={17} style={{ color: "#6758e8" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "3px", minWidth: 0 }}>
+              <strong style={{ fontSize: 12, lineHeight: 1.3 }}>Best performance</strong>
+              <small style={{ fontSize: 10, color: "#697385" }}>Highest exam percentage</small>
+            </div>
+            <b style={{ justifySelf: "end", minWidth: "62px", textAlign: "right", fontSize: 15, lineHeight: 1.2 }}>{bestPercentage}%</b>
+          </div>
+
+          <div className="quickAction" style={{ display: "grid", gridTemplateColumns: "18px minmax(0, 1fr) auto", alignItems: "center", gap: "12px 14px", padding: "13px 4px", borderTop: "1px solid #eff0f4" }}>
+            <BookOpen size={17} style={{ color: "#6758e8" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "3px", minWidth: 0 }}>
+              <strong style={{ fontSize: 12, lineHeight: 1.3 }}>Exams completed</strong>
+              <small style={{ fontSize: 10, color: "#697385" }}>Published results</small>
+            </div>
+            <b style={{ justifySelf: "end", minWidth: "62px", textAlign: "right", fontSize: 15, lineHeight: 1.2 }}>{publishedResults.length}</b>
+          </div>
+
+          <div className="quickAction" style={{ display: "grid", gridTemplateColumns: "18px minmax(0, 1fr) auto", alignItems: "center", gap: "12px 14px", padding: "13px 4px", borderTop: "1px solid #eff0f4" }}>
+            <Clock3 size={17} style={{ color: "#6758e8" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "3px", minWidth: 0 }}>
+              <strong style={{ fontSize: 12, lineHeight: 1.3 }}>Pending results</strong>
+              <small style={{ fontSize: 10, color: "#697385" }}>Waiting for publication</small>
+            </div>
+            <b style={{ justifySelf: "end", minWidth: "62px", textAlign: "right", fontSize: 15, lineHeight: 1.2 }}>{pendingResults.length}</b>
+          </div>
+
+          <div className="quickAction" style={{ display: "grid", gridTemplateColumns: "18px minmax(0, 1fr) auto", alignItems: "center", gap: "12px 14px", padding: "13px 4px", borderTop: "1px solid #eff0f4" }}>
+            <BarChart3 size={17} style={{ color: "#6758e8" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "3px", minWidth: 0 }}>
+              <strong style={{ fontSize: 12, lineHeight: 1.3 }}>Questions evaluated</strong>
+              <small style={{ fontSize: 10, color: "#697385" }}>Total published questions</small>
+            </div>
+            <b style={{ justifySelf: "end", minWidth: "62px", textAlign: "right", fontSize: 15, lineHeight: 1.2 }}>{completedQuestions}</b>
+          </div>
         </div>
       </div>
     </>

@@ -27,6 +27,7 @@ def paddleocr_to_blocks(
 
         for index, (text, score, box) in enumerate(zip(texts, scores, boxes)):
             marker_text = text
+            recognized_text = ""
             if line_recognizer is not None and image is not None:
                 polygon = polygons[index] if index < len(polygons) else box
                 recognized_text = _recognize_crop(
@@ -39,6 +40,7 @@ def paddleocr_to_blocks(
                     text = recognized_text
 
             text = text.strip()
+            print(f"[ocr][page={page_number}][block={index + 1}] paddle={marker_text!r} trocr={recognized_text!r} selected={text!r} source={'TrOCR' if recognized_text else 'PaddleOCR'}")
 
             # Ignore empty OCR detections
             if not text:

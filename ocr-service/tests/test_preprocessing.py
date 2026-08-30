@@ -25,7 +25,7 @@ from app.preprocessing.advanced import (
 )
 
 
-INPUT_PATH = PROJECT_ROOT / "sample" / "test1.pdf"
+INPUT_PATH = PROJECT_ROOT / "sample" /"1788104166013-42135479.pdf"
 OUTPUT_DIR = PROJECT_ROOT / "app" / "output"
 
 

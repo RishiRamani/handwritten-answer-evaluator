@@ -50,23 +50,27 @@ export default function StudentResults() {
             <div className="panel studentResultCard" key={r.submissionId || i}>
               <div className="resultIcon"><FileCheck2 /></div>
               <div className="grow">
-                <span className="badge green">✅ Published</span>
+                <span className="badge green">Published</span>
                 <h2>{r.exam}</h2>
                 <p>Roll No. {roll} · {r.confidence || 0}% AI confidence</p>
                 <p style={{ fontSize: "9px", color: "#6b7280" }}>
                   {r.questions?.length || 0} questions · {r.teacherReviewed ? "✓ Teacher reviewed" : "AI evaluated"}
                 </p>
               </div>
-              <strong className="bigScore">
-                {r.score || 0}
-                <small>/{r.totalMarks || 0}</small>
-              </strong>
-              <Link 
-                className="btn btnPrimary" 
-                to={`/student/results/${roll}/${r.submissionId}`}
-              >
-                View Result
-              </Link>
+
+              <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center", gap: "8px", minWidth: "150px" }}>
+                <strong className="bigScore" style={{ display: "block", textAlign: "left", margin: 0 }}>
+                  {r.score || 0}
+                  <small>/{r.totalMarks || 0}</small>
+                </strong>
+                <Link 
+                  className="btn btnPrimary" 
+                  to={`/student/results/${roll}/${r.submissionId}`}
+                  style={{ width: "fit-content" }}
+                >
+                  View Result
+                </Link>
+              </div>
             </div>
           ))}
 
@@ -75,17 +79,20 @@ export default function StudentResults() {
             <div className="panel studentResultCard" key={r.submissionId || i} style={{ opacity: 0.7 }}>
               <div className="resultIcon" style={{ background: "#fef3c7", color: "#d97706" }}><Clock /></div>
               <div className="grow">
-                <span className="badge amber">⏳ Pending Publication</span>
+                <span className="badge amber">Pending Publication</span>
                 <h2>{r.exam}</h2>
                 <p>Roll No. {roll} · Evaluation complete, waiting for teacher to publish</p>
               </div>
-              <strong className="bigScore" style={{ color: "#6b7280" }}>
-                {r.score || 0}
-                <small>/{r.totalMarks || 0}</small>
-              </strong>
-              <span className="btn btnSoft" style={{ cursor: "default" }}>
-                Awaiting Publication
-              </span>
+
+              <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center", gap: "8px", minWidth: "150px" }}>
+                <strong className="bigScore" style={{ display: "block", textAlign: "left", color: "#6b7280", margin: 0 }}>
+                  {r.score || 0}
+                  <small>/{r.totalMarks || 0}</small>
+                </strong>
+                <span className="btn btnSoft" style={{ cursor: "default", width: "fit-content" }}>
+                  Awaiting Publication
+                </span>
+              </div>
             </div>
           ))}
         </>

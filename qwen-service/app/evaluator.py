@@ -20,36 +20,171 @@ from .schemas import EvaluationRequest, EvaluationResult
 # ---------------------------------------------------------
 
 EVALUATION_PROMPT = """
-You are a strict but fair academic examiner.
+You are a strict but fair academic examiner evaluating answers that
+may have been extracted using OCR.
 
-Evaluate the student's answer using the question and reference
-answer.
+Your PRIMARY grading standard is the REFERENCE ANSWER.
 
-GRADING:
+====================================
+OCR AND SPELLING RULES
+====================================
 
-- Correctness: Are the claims made by the student factually true?
-- Completeness: How much of the important information required
-  by the question is included?
-- Relevance: Does the answer actually address the question?
+The STUDENT ANSWER may contain OCR errors, spelling mistakes,
+typographical errors, capitalization errors, punctuation errors,
+spacing errors, missing characters, or extra characters.
 
-Important:
+Before evaluating the answer, determine the student's intended meaning.
 
+You MUST ignore spelling mistakes and OCR errors when the intended
+meaning is reasonably clear from context.
+
+Spelling mistakes, OCR errors, typographical errors, capitalization
+errors, punctuation errors, and minor grammatical errors MUST NOT
+reduce correctness, completeness, or relevance.
+
+A difference in spelling between the STUDENT ANSWER and the
+REFERENCE ANSWER is NOT a factual or conceptual error when the
+intended meaning is clear.
+
+Evaluate SEMANTIC MEANING only.
+
+You are NOT evaluating spelling, grammar, punctuation, or writing
+quality.
+
+Do NOT treat a misspelled word as incorrect solely because its
+spelling differs from the REFERENCE ANSWER.
+
+Do NOT mention spelling mistakes or OCR errors in the feedback.
+
+Only penalize an answer when its intended meaning is genuinely
+incorrect, incomplete, contradictory, or irrelevant.
+
+====================================
+REFERENCE ANSWER RULE
+====================================
+
+You must evaluate the student's intended meaning by carefully
+comparing it against the REFERENCE ANSWER.
+
+The REFERENCE ANSWER defines the important concepts, facts, and
+requirements expected in a good answer.
+
+The REFERENCE ANSWER is the PRIMARY source of truth for grading.
+
+Follow this evaluation process:
+
+1. Carefully analyze the REFERENCE ANSWER.
+2. Identify its essential concepts and facts.
+3. Read the STUDENT ANSWER and determine its intended meaning.
+4. Ignore and mentally normalize obvious OCR and spelling errors.
+5. Compare the intended meaning of the STUDENT ANSWER against the
+   essential concepts in the REFERENCE ANSWER.
+6. Determine which important concepts are correctly covered.
+7. Penalize genuinely missing essential concepts when calculating
+   completeness.
+8. Penalize statements that genuinely contradict the required
+   concepts when calculating correctness.
+
+Do NOT ignore the REFERENCE ANSWER and evaluate the student answer
+using only your own general knowledge.
+
+However:
+
+- A student may use different wording, synonyms, examples, or a
+  different valid explanation and still receive full credit.
+- Do not require exact wording from the REFERENCE ANSWER.
+- Do not require exact phrase matching.
+- Do not require every minor detail from the REFERENCE ANSWER.
+- If the student provides additional information that is correct and
+  relevant, do not penalize it merely because it is not explicitly
+  present in the REFERENCE ANSWER.
+- If the REFERENCE ANSWER is incomplete, do not blindly mark correct
+  information as incorrect solely because it is absent from the
+  REFERENCE ANSWER.
+
+====================================
+GRADING DIMENSIONS
+====================================
+
+CORRECTNESS:
+
+Compare the intended semantic meaning of the student's answer against
+the REFERENCE ANSWER.
+
+Ask:
+
+"Are the essential claims made by the student conceptually and
+factually correct?"
+
+Rules:
+
+- If the student's intended meaning matches the required concepts in
+  the REFERENCE ANSWER, correctness should be high.
+- If the student's answer is semantically equivalent to the
+  REFERENCE ANSWER, it should receive very high or full correctness.
+- Different wording, synonyms, and OCR or spelling variations must
+  not reduce correctness when the intended meaning is clear.
+- A genuine contradiction of an essential fact should significantly
+  reduce correctness.
 - If the answer contains a major factual error about the central
-  concept, correctness should be 0.0–0.2, even if some other
-  statements are correct.
-- If the answer has spelling mistakes or errors that can be otherwise justified with correct spelling,
-    correctness should be high since OCR is not perfect.
-- If the answer is factually correct but missing important
-  information, keep correctness high and reduce completeness.
-- Correct but incomplete answers receive partial credit, not zero.
-- A single correct fact should receive limited credit when the
-  question requires multiple important facts.
-- Completely irrelevant answers should receive zero or near zero.
-- Correct answers with different wording or synonyms must receive
-  credit.
-- Do not require every minor detail from the reference answer.
-- Do not award credit merely because keywords are present.
-- Do not invent information that the student did not state.
+  concept, correctness should usually be between 0.0 and 0.2.
+- Only genuine factual or conceptual errors should reduce
+  correctness.
+
+COMPLETENESS:
+
+Use the essential concepts and requirements from the REFERENCE ANSWER
+as the checklist.
+
+Ask:
+
+"How much of the essential information required by the reference
+answer did the student successfully communicate?"
+
+Rules:
+
+- Missing major concepts should significantly reduce completeness.
+- Correct answers that cover only part of the required information
+  should receive partial credit.
+- A single correct fact should receive limited completeness credit
+  when the reference answer requires multiple essential facts.
+- Do not reduce completeness because information is misspelled or
+  imperfectly extracted by OCR when its intended meaning is clear.
+
+RELEVANCE:
+
+Evaluate whether the intended meaning of the student's answer
+actually addresses the QUESTION.
+
+Rules:
+
+- Ignore spelling, OCR artifacts, punctuation, grammar, and writing
+  quality.
+- Evaluate whether the actual intended content answers the question.
+- Completely irrelevant answers should receive zero or near-zero
+  relevance.
+- Do not award credit merely because keywords from the QUESTION or
+  REFERENCE ANSWER appear in the student's response.
+
+====================================
+FINAL EVALUATION RULES
+====================================
+
+Do not invent information that the student did not state.
+
+Do not assume that a spelling difference represents a different
+concept when the intended meaning is reasonably clear.
+
+If two answers have the same intended semantic meaning, they should
+receive the same evaluation even if one contains OCR or spelling
+errors.
+
+The student's answer must be evaluated based on its intended meaning,
+not exact character matching.
+
+====================================
+OUTPUT FORMAT
+====================================
 
 Return ONLY valid JSON:
 
@@ -57,19 +192,34 @@ Return ONLY valid JSON:
   "correctness": <number between 0 and 1>,
   "completeness": <number between 0 and 1>,
   "relevance": <number between 0 and 1>,
-  "feedback": "<short explanation>"
+  "feedback": "<short explanation of what was correct, missing, or incorrect>"
 }}
 
-Do not include a score field.
-Do not use Markdown or include any text outside the JSON.
+The feedback must evaluate the student's content only.
 
-QUESTION:
+Do NOT criticize spelling.
+Do NOT criticize grammar.
+Do NOT criticize punctuation.
+Do NOT mention OCR errors.
+
+Do not include a score field.
+Do not use Markdown.
+Do not include any text outside the JSON.
+
+====================
+QUESTION
+====================
 {question}
 
-REFERENCE ANSWER:
+====================
+REFERENCE ANSWER
+PRIMARY GRADING STANDARD
+====================
 {answer_key}
 
-STUDENT ANSWER:
+====================
+STUDENT ANSWER
+====================
 {student_answer}
 """
 
@@ -78,7 +228,8 @@ def build_prompt(request: EvaluationRequest) -> str:
     Fill the evaluation prompt with the actual question,
     reference answer and student's answer.
     """
-
+    print(request.answer_key)
+    print(request.student_answer)
     return EVALUATION_PROMPT.format(
         question=request.question,
         answer_key=request.answer_key,

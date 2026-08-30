@@ -41,11 +41,17 @@ def process_page(
     
     # Reconstruct reading order
     lines = reconstruct_reading_order(blocks)
+    print(f"[postprocess][page={page_number}] blocks={len(blocks)} reconstructed_lines={len(lines)}")
+    for line_index, line in enumerate(lines, start=1):
+        print(f"[postprocess][page={page_number}][line={line_index}] {' '.join(block['text'] for block in line)}")
     
     # Extract questions and answers
     qa_pairs = segment_questions(lines)
     for qa_pair in qa_pairs:
         qa_pair['page'] = page_number
+    print(f"[postprocess][page={page_number}] question_answer_pairs={len(qa_pairs)}")
+    for qa_pair in qa_pairs:
+        print(f"[postprocess][page={page_number}][Q{qa_pair['question_number']}] question={qa_pair['question_text']!r} answer={qa_pair['answer_text']!r}")
     
     return {
         'qa_pairs': qa_pairs,

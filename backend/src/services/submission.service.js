@@ -71,6 +71,19 @@ export async function runEvaluationPipeline(submissionId, examArg) {
         q => String(q._id) === String(answer.questionId)
       );
 
+      if (!answer.ocrText.trim()) {
+        await Evaluation.create({
+          answerId: answer._id,
+          correctness: 0,
+          completeness: 0,
+          relevance: 0,
+          score: 0,
+          confidence: Number.isFinite(answer.ocrConfidence) ? answer.ocrConfidence : 0,
+          feedback: "No answer text was extracted from the submitted answer sheet."
+        });
+        continue;
+      }
+
       const result = await evaluateAnswer({
         question: question.questionText,
         answerKey: question.answerKey,

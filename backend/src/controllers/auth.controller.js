@@ -50,8 +50,20 @@ export async function login(req, res) {
     return res.json({
       success: true,
       data: {
-        token: createToken({ role, roll: normalizedRoll, name: student.name }),
-        user: { role, roll: normalizedRoll, name: student.name }
+        token: createToken({
+          role,
+          roll: normalizedRoll,
+          name: student.name,
+          program: student.program || "",
+          year: student.year || ""
+        }),
+        user: {
+          role,
+          roll: normalizedRoll,
+          name: student.name,
+          program: student.program || "",
+          year: student.year || ""
+        }
       }
     });
   }

@@ -28,7 +28,7 @@ def main():
         dpi=300,
         target_width=2000,
         denoise=True,
-        perspective=True,
+        perspective=False,
         deskew=True,
         contrast=True,
         threshold=False,
