@@ -1,5 +1,9 @@
 # EvalX
 
+DEMO URL:
+https://github.com/user-attachments/assets/bf3a0efe-e890-4680-914e-fb90abb8d8fb
+
+
 EvalX is an automated examination evaluation platform for handwritten answer sheets. Teachers create examinations, upload student answer-sheet PDFs, and review AI-generated scores and feedback. Students can view their published results and performance statistics.
 
 ## Features
